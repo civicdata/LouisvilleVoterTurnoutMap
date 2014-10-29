@@ -68,11 +68,12 @@
       cursor: hand;
     }
     
-    @media only screen and (-webkit-min-device-pixel-ratio: 2) and (min-width: 768px),
-    only screen and (min--moz-device-pixel-ratio: 2) and (min-width: 768px),
-    only screen and (-o-min-device-pixel-ratio: 2/1) and (min-width: 768px),
-    only screen and (min-device-pixel-ratio: 2) and (min-width: 768px),
-    only screen and (min-resolution: 2dppx){
+    @media only screen and (-webkit-min-device-pixel-ratio: 2),
+        only screen and (   min--moz-device-pixel-ratio: 2),
+        only screen and (     -o-min-device-pixel-ratio: 2/1),
+        only screen and (        min-device-pixel-ratio: 2),
+        only screen and (                min-resolution: 192dpi),
+        only screen and (                min-resolution: 2dppx) {
       /* retina display. dpr 2 */
       #attribution a {
         background-image:url('CDAlogo@2x.png');
@@ -80,10 +81,10 @@
       }
     }
 
-    @media only screen and (-webkit-min-device-pixel-ratio: 3) and (min-width: 768px),
-    only screen and (min--moz-device-pixel-ratio: 3) and (min-width: 768px),
-    only screen and (-o-min-device-pixel-ratio: 3/1) and (min-width: 768px),
-    only screen and (min-device-pixel-ratio: 3) and (min-width: 768px),
+    @media only screen and (-webkit-min-device-pixel-ratio: 3),
+    only screen and (min--moz-device-pixel-ratio: 3),
+    only screen and (-o-min-device-pixel-ratio: 3/1),
+    only screen and (min-device-pixel-ratio: 3),
     only screen and (min-resolution: 3dppx){
       /* dpr 3 */
       #attribution a {
@@ -123,7 +124,9 @@
             left: 0 !important;
         }
         #attribution {
-            display: none;
+            position: absolute;
+            left:50px;
+            top: 7px;
         }
     }
         
@@ -137,6 +140,16 @@
             margin: 2px;
         }
     }
+    
+    @media only screen 
+        and (min-device-width: 320px) 
+        and (max-device-width: 568px) 
+        and (orientation: landscape) {
+        #attribution {
+            display: none;
+        }
+    }
+    
   </style>
 </head>
 <body>
