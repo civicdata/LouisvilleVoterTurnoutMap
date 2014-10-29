@@ -152,6 +152,7 @@
       this._div.innerHTML = '<h4>Precinct Info</h4>';
       
       if(props) {
+          this._div.innerHTML += '<i>Precinct: ' + props['Name'] + '</i><br />';
           if(props[selectedMetric] == null) {
               this._div.innerHTML += '<b>No Data for Selected Precinct<b/>';
               return;
