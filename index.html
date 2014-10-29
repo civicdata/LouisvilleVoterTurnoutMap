@@ -125,8 +125,8 @@
         }
         #attribution {
             position: absolute;
-            left:50px;
-            top: 9px;
+            left: 50px;
+            top: 12px;
         }
     }
         
@@ -188,7 +188,14 @@
   <script src="js/Control.Geocoder.CDA.js"></script>
   <script type="text/javascript">
 
-    var map = L.map('map').setView([38.18395805672033, -85.660400390625], 11);
+    function isTouchDevice() {
+        if(('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch) {
+            return true;
+        }
+        return false;
+    }
+  
+    var map = L.map('map').setView([38.18395805672033, -85.660400390625], isTouchDevice() ? 10.5 : 11);
     var selectedMetric = 'totTurnout';
     var lastFeature;
     
