@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Leaflet Layers Control Example</title>
+  <title>Louisville 2014 Voter Turnout Map</title>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
@@ -70,9 +70,9 @@
         <div class="cda-panel-heading">Turnout %</div>
         <div class="cda-panel-body">
             <div class="btn-group">
-              <button type="button" class="btn btn-default" id="turnout-total">Total</button>
-              <button type="button" class="btn btn-default" id="turnout-dem">Democrat</button>
-              <button type="button" class="btn btn-default" id="turnout-rep">Republican</button>
+              <button type="button" class="btn btn-default" id="totTurnout">Total</button>
+              <button type="button" class="btn btn-default" id="demTurnout">Democrat</button>
+              <button type="button" class="btn btn-default" id="repTurnout">Republican</button>
             </div>
         </div>
       </div>
@@ -81,26 +81,28 @@
         <div class="cda-panel-heading">Registered Voters</div>
         <div class="cda-panel-body">
             <div class="btn-group">
-              <button type="button" class="btn btn-default" id="registered-total">Total</button>
-              <button type="button" class="btn btn-default" id="registered-dem">Democrat</button>
-              <button type="button" class="btn btn-default" id="registered-rep">Republican</button>
+              <button type="button" class="btn btn-default" id="totReg">Total</button>
+              <button type="button" class="btn btn-default" id="demReg">Democrat</button>
+              <button type="button" class="btn btn-default" id="repReg">Republican</button>
             </div>
         </div>
       </div>
   </div>
 
   <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
-
   <script type="text/javascript" src="js/precincts.js"></script>
+  <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
   <script type="text/javascript">
 
     var map = L.map('map').setView([38.18395805672033, -85.660400390625], 11);
-
-    L.tileLayer('http://tile.stamen.com/toner/{z}/{x}/{y}.png', {
+    var selectedMetric = 'totTurnout';
+    
+    var layer = L.tileLayer('http://tile.stamen.com/toner/{z}/{x}/{y}.png', {
       maxZoom: 18,
       attribution: 'Map by Stamen'
-    }).addTo(map);
-
+    });
+    
+    layer.addTo(map);
 
     // control that shows state info on hover
     var info = L.control();
@@ -119,17 +121,33 @@
 
     info.addTo(map);
 
+    breaks = {
+        'totTurnout': [50,30,25,20,10],
+        'demTurnout': [51,30,20,15,10],
+        'repTurnout': [100,40,30,20,10],
+        'totReg': [2054,1500,1000,600,300],
+        'demReg': [1512,1000,750,500,250],
+        'repReg': [1176,700,500,300,150]
+    };
+    
+    colors = [
+        '#800026',
+        '#BD0026',
+        '#E31A1C',
+        '#FC4E2A',
+        '#FD8D3C',
+        '#FEB24C',
+        '#FED976',
+    ];
 
     // get color depending on population density value
     function getColor(d) {
-      return d > 1000 ? '#800026' :
-             d > 500  ? '#BD0026' :
-             d > 200  ? '#E31A1C' :
-             d > 100  ? '#FC4E2A' :
-             d > 50   ? '#FD8D3C' :
-             d > 20   ? '#FEB24C' :
-             d > 10   ? '#FED976' :
-                        '#FFEDA0';
+        for (var i = 0; i < breaks[selectedMetric].length; i++) {
+            if(d > breaks[selectedMetric][i]) {
+                return colors[i];
+            }
+        }
+        return '#FFEDA0';
     }
 
     function style(feature) {
@@ -139,7 +157,7 @@
         color: 'white',
         //dashArray: '3',
         fillOpacity: 0.7,
-        fillColor: getColor(feature.properties.demReg)
+        fillColor: getColor(feature.properties[selectedMetric])
       };
     }
 
@@ -179,22 +197,32 @@
       });
     }
 
+    function updateStyle() {
+        geojson.setStyle(style);
+        map.removeControl(legend);
+        legend.addTo(map);
+    }
+    
+    function setButtonStatus() {
+        $('#controls button').removeClass('active');
+        $('#controls button#' + selectedMetric).addClass('active');
+    }
+
     geojson = L.geoJson(precincts, {
       style: style,
       onEachFeature: onEachFeature
     }).addTo(map);
-
-
 
     var legend = L.control({position: 'bottomright'});
 
     legend.onAdd = function (map) {
 
       var div = L.DomUtil.create('div', 'info legend'),
-        grades = [0, 10, 20, 50, 100, 200, 500, 1000],
+        grades = [0].concat(breaks[selectedMetric].reverse()),
         labels = [],
         from, to;
 
+      breaks[selectedMetric].reverse();    
       for (var i = 0; i < grades.length; i++) {
         from = grades[i];
         to = grades[i + 1];
@@ -209,6 +237,16 @@
     };
 
     legend.addTo(map);
+    
+    $(function() {
+        $('#controls button').on('click', function(event) {
+            selectedMetric = event.target.id;
+            updateStyle();
+            setButtonStatus();
+        });
+        
+        setButtonStatus();
+    });
 
   </script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
