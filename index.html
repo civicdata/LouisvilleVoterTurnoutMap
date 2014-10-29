@@ -162,23 +162,16 @@
     };
 
     info.update = function (props) {
-      this._div.innerHTML = '<h4>Precinct Info</h4>';
+      this._div.innerHTML = '<h4>May 2014 Primary</h4>';
       
       if(props) {
-          this._div.innerHTML += '<i>Precinct: ' + props['Name'] + '</i><br />';
+          this._div.innerHTML += '<i>Precinct ' + props['Name'] + '</i><br />';
           if(props[selectedMetric] == null) {
-              this._div.innerHTML += '<b>No Data for Selected Precinct<b/>';
+              this._div.innerHTML += '<b>No Data<b/>';
               return;
           }
+          this._div.innerHTML += '<table border=0 style="padding: 2px;"><tr><td>&nbsp;</td><td align="right">Voters</td><td>&nbsp;&nbsp;Turnout</td></tr> <tr><td><b>Total</b></td><td align="right">' + props['totReg']  + '</td><td align="right">' + props['totTurnout'] + '%</td></tr> <tr><td><b>Democrat</b></td><td align="right">' + props['demReg']  + '</td><td align="right">' + props['demTurnout'] + '%</td></tr> <tr><td><b>Republican</b></td><td align="right">' + props['repReg']  + '</td><td align="right">' + props['repTurnout'] + '%</td></tr> </table>';
           
-          if($.inArray(selectedMetric, ['totTurnout', 'demTurnout', 'repTurnout']) > -1) {
-              this._div.innerHTML += '<b>' + props[selectedMetric] + '% Turnout</b><br />';
-              this._div.innerHTML += props[displayValues[selectedMetric][0]] + ' Registered<br>';
-              this._div.innerHTML += props[displayValues[selectedMetric][1]] + ' Voted (' + props[selectedMetric] + '%)';
-          } else {
-              this._div.innerHTML += '<b>' + props[selectedMetric] + ' Registered</b><br />';
-              this._div.innerHTML += props[displayValues[selectedMetric][0]] + ' Voted';
-          }
       } else {
           this._div.innerHTML += 'Hover over a precinct.'
       }
