@@ -67,11 +67,29 @@
     #controls .cda-panel-heading {
         font-weight: bold;
     }
+    
+    @media screen and (max-width: 850px) { 
+        #controls {
+            position: relative;
+        }
+        #controls-inner { 
+            position: fixed !important;
+            bottom: 0 !important;
+            left: 0 !important;
+        }
+    }
+    
+    @media screen and (max-width: 650px) { 
+        #controls-inner {
+            width: 300px;
+        }
+    }
   </style>
 </head>
 <body>
   <div id="map"></div>
   <div id="controls">
+      <div id="controls-inner">
       <div class="cda-panel cda-panel-default">
         <div class="cda-panel-heading">Turnout %</div>
         <div class="cda-panel-body">
@@ -93,6 +111,7 @@
             </div>
         </div>
       </div>
+      </div>
   </div>
 
   <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
@@ -103,6 +122,7 @@
 
     var map = L.map('map').setView([38.18395805672033, -85.660400390625], 11);
     var selectedMetric = 'totTurnout';
+    var lastFeature;
     
     breaks = {
         'totTurnout': [50,30,25,20,10],
@@ -184,10 +204,7 @@
         return false;
     }
 
-
-    if(!isTouchDevice()) {
-        info.addTo(map);
-    }
+    info.addTo(map);
     
     // get color depending on population density value
     function getColor(d) {
@@ -210,7 +227,18 @@
       };
     }
 
+    function resetHighlight(e) {
+      geojson.resetStyle(e.target);
+      info.update();
+    }
+    
     function highlightFeature(e) {
+      if(lastFeature) {
+          resetHighlight(lastFeature);
+      }
+      
+      lastFeature = e;
+      
       var layer = e.target;
 
       layer.setStyle({
@@ -229,11 +257,6 @@
 
     var geojson;
 
-    function resetHighlight(e) {
-      geojson.resetStyle(e.target);
-      info.update();
-    }
-
     function zoomToFeature(e) {
       map.fitBounds(e.target.getBounds());
     }
@@ -242,6 +265,7 @@
       layer.on({
         mouseover: highlightFeature,
         mouseout: resetHighlight,
+        click: highlightFeature,
         dblclick: zoomToFeature
       });
     }
