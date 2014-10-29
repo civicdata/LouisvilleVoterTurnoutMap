@@ -19,10 +19,11 @@
       padding: 6px 8px;
       font: 14px/16px Arial, Helvetica, sans-serif;
       background: white;
-      background: rgba(255,255,255,0.8);
+      background: rgba(255,255,255,0.9);
       box-shadow: 0 0 15px rgba(0,0,0,0.2);
       border-radius: 5px;
     }
+    
     .info h4 {
       margin: 0 0 5px;
       color: #777;
@@ -33,6 +34,7 @@
       line-height: 18px;
       color: #555;
     }
+    
     .legend i {
       width: 18px;
       height: 18px;
@@ -97,6 +99,35 @@
     var map = L.map('map').setView([38.18395805672033, -85.660400390625], 11);
     var selectedMetric = 'totTurnout';
     
+    breaks = {
+        'totTurnout': [50,30,25,20,10],
+        'demTurnout': [51,30,20,15,10],
+        'repTurnout': [100,40,30,20,10],
+        'totReg': [2054,1500,1000,600,300],
+        'demReg': [1512,1000,750,500,250],
+        'repReg': [1176,700,500,300,150]
+    };
+    
+    // Used in the info box code for lookups
+    displayValues = {
+        'totTurnout': ['totReg', 'totVote'],
+        'demTurnout': ['demReg', 'demVote'],
+        'repTurnout': ['repReg', 'repVote'],
+        'totReg': ['totVote', 'totTurnout'],
+        'demReg': ['demVote', 'demTurnout'],
+        'repReg': ['repVote', 'repTurnout'],
+    };
+    
+    colors = [
+        '#800026',
+        '#BD0026',
+        '#E31A1C',
+        '#FC4E2A',
+        '#FD8D3C',
+        '#FEB24C',
+        '#FED976',
+    ];
+    
     var layer = L.tileLayer('http://tile.stamen.com/toner/{z}/{x}/{y}.png', {
       maxZoom: 18,
       attribution: 'Map by Stamen'
@@ -114,31 +145,28 @@
     };
 
     info.update = function (props) {
-      this._div.innerHTML = '<h4>US Population Density</h4>' +  (props ?
-        '<b>' + props.name + '</b><br />' + props.demReg + ' people / mi<sup>2</sup>'
-        : 'Hover over a state');
+      this._div.innerHTML = '<h4>Precinct Info</h4>';
+      
+      if(props) {
+          if(props[selectedMetric] == null) {
+              this._div.innerHTML += '<b>No Data for Selected Precinct<b/>';
+              return;
+          }
+          
+          if($.inArray(selectedMetric, ['totTurnout', 'demTurnout', 'repTurnout']) > -1) {
+              this._div.innerHTML += '<b>' + props[selectedMetric] + '% Turnout</b><br />';
+              this._div.innerHTML += props[displayValues[selectedMetric][0]] + ' Registered<br>';
+              this._div.innerHTML += props[displayValues[selectedMetric][1]] + ' Voted (' + props[selectedMetric] + '%)';
+          } else {
+              this._div.innerHTML += '<b>' + props[selectedMetric] + ' Registered</b><br />';
+              this._div.innerHTML += props[displayValues[selectedMetric][0]] + ' Voted';
+          }
+      } else {
+          this._div.innerHTML += 'Hover over a precinct.'
+      }
     };
 
     info.addTo(map);
-
-    breaks = {
-        'totTurnout': [50,30,25,20,10],
-        'demTurnout': [51,30,20,15,10],
-        'repTurnout': [100,40,30,20,10],
-        'totReg': [2054,1500,1000,600,300],
-        'demReg': [1512,1000,750,500,250],
-        'repReg': [1176,700,500,300,150]
-    };
-    
-    colors = [
-        '#800026',
-        '#BD0026',
-        '#E31A1C',
-        '#FC4E2A',
-        '#FD8D3C',
-        '#FEB24C',
-        '#FED976',
-    ];
 
     // get color depending on population density value
     function getColor(d) {
