@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
-
+  <link rel="stylesheet" href="css/Control.Geocoder.css" />
   <style>
     html, body {
       height: 100%;
@@ -98,6 +98,7 @@
   <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
   <script type="text/javascript" src="js/precincts.js"></script>
   <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+  <script src="js/Control.Geocoder.js"></script>
   <script type="text/javascript">
 
     var map = L.map('map').setView([38.18395805672033, -85.660400390625], 11);
@@ -138,6 +139,18 @@
     });
     
     layer.addTo(map);
+
+    L.Control.geocoder({
+      geocoder: L.Control.Geocoder.nominatim({
+          geocodingQueryParams: {
+            bounded: 1, 
+            viewbox: "-85.9,38.3,-85.5,38.1," // bound to Louisville bbox
+          }
+        }),
+      collapsed: false,
+      placeholder: "Search location..",
+      position: "topright" // change when finishing up UI
+    }).addTo(map);
 
     // control that shows state info on hover
     var info = L.control();
