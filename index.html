@@ -6,6 +6,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
 
   <style>
     #map {
@@ -38,10 +40,54 @@
       margin-right: 8px;
       opacity: 0.7;
     }
+    
+    #controls { 
+        position: absolute;
+        top: 5px;
+        left: 50px;
+    }
+    
+    #controls .cda-panel {
+        float: left;
+        margin: 5px;
+        background-color: #fff;
+        border: 1px solid #e0e0e0;
+        background: rgba(255,255,255,0.8);
+        box-shadow: 0 0 15px rgba(0,0,0,0.2);
+        border-radius: 5px;
+        padding: 5px;
+    }
+    
+    #controls .cda-panel-heading {
+        font-weight: bold;
+    }
   </style>
 </head>
 <body>
   <div id="map"></div>
+  <div id="controls">
+      <div class="cda-panel cda-panel-default">
+        <div class="cda-panel-heading">Turnout %</div>
+        <div class="cda-panel-body">
+            <div class="btn-group">
+              <button type="button" class="btn btn-default">Total</button>
+              <button type="button" class="btn btn-default">Democrat</button>
+              <button type="button" class="btn btn-default">Republican</button>
+            </div>
+        </div>
+      </div>
+      
+      <div class="cda-panel cda-panel-default">
+        <div class="cda-panel-heading">Registered Voters</div>
+        <div class="cda-panel-body">
+            <div class="btn-group">
+              <button type="button" class="btn btn-default">Total</button>
+              <button type="button" class="btn btn-default">Democrat</button>
+              <button type="button" class="btn btn-default">Republican</button>
+            </div>
+        </div>
+      </div>
+  </div>
 
   <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
 
@@ -165,5 +211,6 @@
     legend.addTo(map);
 
   </script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 </body>
 </html>
