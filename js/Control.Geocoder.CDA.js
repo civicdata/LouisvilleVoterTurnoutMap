@@ -104,7 +104,8 @@
 
 		markGeocode: function(result) {
 			this._map.fitBounds(result.bbox);
-
+            this._map.setZoom(14);
+            
 			if (this._geocodeMarker) {
 				this._map.removeLayer(this._geocodeMarker);
 			}
