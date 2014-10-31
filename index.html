@@ -209,17 +209,18 @@
     };
     
     // Used in the info box code for lookups
+    // available JSON data:  {"Name":"A140","county":"56","totReg":"1608","totVote":"294","totTurnout":"18.3","demReg":"882","demVote":"161","demTurnout":"18.3","repReg":"579","repVote":"131","repTurnout":"22.6","otherReg":"147","otherVote":"2","otherTurnout":"1.4"}
     displayValues = {
         'totTurnout': ['totReg', 'totVote'],
         'demTurnout': ['demReg', 'demVote'],
         'repTurnout': ['repReg', 'repVote'],
         'totReg': ['totVote', 'totTurnout'],
         'demReg': ['demVote', 'demTurnout'],
-        'repReg': ['repVote', 'repTurnout'],
+        'repReg': ['repVote', 'repTurnout']
     };
     
     colors = [
-           '#b30000',	
+        '#b30000',	
         '#e34a33',
         '#fc8d59',
         '#fdcc8a',
@@ -263,19 +264,43 @@
               this._div.innerHTML += '<b>No Data<b/>';
               return;
           }
-          this._div.innerHTML += '<table border=0 style="padding: 2px;"><tr><td>&nbsp;</td><td align="right">Voters</td><td>&nbsp;&nbsp;Turnout</td></tr> <tr><td><b>Total</b></td><td align="right">' + props['totReg']  + '</td><td align="right">' + props['totTurnout'] + '%</td></tr> <tr><td><b>Democrat</b></td><td align="right">' + props['demReg']  + '</td><td align="right">' + props['demTurnout'] + '%</td></tr> <tr><td><b>Republican</b></td><td align="right">' + props['repReg']  + '</td><td align="right">' + props['repTurnout'] + '%</td></tr> </table>';
-          
+          this._div.innerHTML += '<table border=0 style="padding: 2px;"><tr><td>&nbsp;</td><td align="right">Voters</td><td>&nbsp;&nbsp;Turnout</td></tr> <tr><td><b>Total</b></td><td align="right">' + props['totReg']  + '</td><td align="right">' + props['totTurnout'] + '%</td></tr> <tr><td><b>Democrat</b></td><td align="right">' + props['demReg']  + '</td><td align="right">' + props['demTurnout'] + '%</td></tr> <tr><td><b>Republican</b></td><td align="right">' + props['repReg']  + '</td><td align="right">' + props['repTurnout'] + '%</td></tr> <tr><td><b>Difference</b></td><td align="right">' + voterDifference(props['demReg'],props['repReg']) + '</td><td align="right">' + turnoutDifference(props['demTurnout'],props['repTurnout']) + '</td></tr> </table>';
+         
       } else {
           this._div.innerHTML +=  (isTouchDevice() ? 'Click' : 'Hover over or double<br>click') + ' a precinct.'
       }
     };
 
-    function isTouchDevice() {
-        if(('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch) {
-            return true;
+    function voterDifference(dem, rep) {
+        var diff, color, divider;
+        if ((dem-rep) > 0) { // more dems
+            diff = dem-rep;
+            color = 'blue';
+            divider = rep;
+        } else { // more reps
+            diff = rep-dem;
+            color = 'red';
+            divider = dem;
         }
-        return false;
+        percent = Math.round((diff)/divider*100* 10 ) / 10;
+        return '<span style="color: '+ color +';">'+ percent +"%</span>";
     }
+    
+    function turnoutDifference(dem, rep) {
+        var diff, color, divider;
+        if ((dem-rep) > 0) { // more dems
+            diff = dem-rep;
+            color = 'blue';
+            divider = rep;
+        } else { // more reps
+            diff = rep-dem;
+            color = 'red';
+            divider = dem;
+        }
+        percent = Math.round((diff)/divider*100* 10 ) / 10;
+        return '<span style="color: '+ color +';">'+ percent +"%</span>";
+    }
+    
 
     info.addTo(map);
     
