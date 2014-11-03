@@ -264,41 +264,54 @@
               this._div.innerHTML += '<b>No Data<b/>';
               return;
           }
-          this._div.innerHTML += '<table border=0 style="padding: 2px;"><tr><td>&nbsp;</td><td align="right">Voters</td><td>&nbsp;&nbsp;Turnout</td></tr> <tr><td><b>Total</b></td><td align="right">' + props['totReg']  + '</td><td align="right">' + props['totTurnout'] + '%</td></tr> <tr><td><b>Democrat</b></td><td align="right">' + props['demReg']  + '</td><td align="right">' + props['demTurnout'] + '%</td></tr> <tr><td><b>Republican</b></td><td align="right">' + props['repReg']  + '</td><td align="right">' + props['repTurnout'] + '%</td></tr> <tr><td><b>Difference</b></td><td align="right">' + voterDifference(props['demReg'],props['repReg']) + '</td><td align="right">' + turnoutDifference(props['demTurnout'],props['repTurnout']) + '</td></tr> </table>';
+          this._div.innerHTML += '<table border=0 style="padding: 2px;"><tr><td>&nbsp;</td><td align="right">Voters</td><td>&nbsp;&nbsp;Turnout</td></tr> <tr><td><b>Total</b></td><td align="right">' + props['totReg']  + '</td><td align="right">' + props['totTurnout'] + '%</td></tr> <tr><td><b>Democrat</b></td><td align="right">' + props['demReg']  + '</td><td align="right">' + props['demTurnout'] + '%</td></tr> <tr><td><b>Republican</b></td><td align="right">' + props['repReg']  + '</td><td align="right">' + props['repTurnout'] + '%</td></tr> <tr><td><b>Difference</b></td><td align="right">' + Difference(props['demReg'],props['repReg']) + '</td><td align="right">' + Difference(props['demTurnout'],props['repTurnout']) + '</td></tr> </table>';
          
       } else {
           this._div.innerHTML +=  (isTouchDevice() ? 'Click' : 'Hover over or double<br>click') + ' a precinct.'
       }
     };
-
-    function voterDifference(dem, rep) {
-        var diff, color, divider;
-        if ((dem-rep) > 0) { // more dems
-            diff = dem-rep;
-            color = 'blue';
-            divider = rep;
-        } else { // more reps
-            diff = rep-dem;
-            color = 'red';
-            divider = dem;
+    
+    function fixPercent(percent) {
+        if (percent == 'Infinity') {
+            percent = 'All Dem';
+        } else if (isNaN(percent)) {
+            percent = 'All Rep';
+        } else if (percent == 0) {
+            percent = 'Even';
+        } else {
+            percent = percent+'x';
         }
-        percent = Math.round((diff)/divider*100* 10 ) / 10;
-        return '<span style="color: '+ color +';">'+ percent +"%</span>";
+        return percent;
     }
     
-    function turnoutDifference(dem, rep) {
-        var diff, color, divider;
+    
+    function Difference(dem, rep) {
+        var diff, color, divider, top;
         if ((dem-rep) > 0) { // more dems
             diff = dem-rep;
             color = 'blue';
+            top = dem;
             divider = rep;
-        } else { // more reps
+        } else if ((rep-dem) > 0) { // more reps
             diff = rep-dem;
             color = 'red';
+            top = rep;
             divider = dem;
+        } else { 
+            diff = -1;
+            color = "black";
+            divider = -1;
         }
-        percent = Math.round((diff)/divider*100* 10 ) / 10;
-        return '<span style="color: '+ color +';">'+ percent +"%</span>";
+    
+        if (diff != -1) {
+            percent = Math.round((top)/divider* 10 ) / 10;
+            //console.log (dem+' - '+rep+' - '+top+' - '+divider+' - '+percent);
+            percent = fixPercent(percent);
+        } else {
+            percent = 'None';
+        }
+        
+        return '<span style="color: '+ color +';">'+ percent +"</span>";
     }
     
 
