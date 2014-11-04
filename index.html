@@ -337,7 +337,7 @@
     
     // get color depending on population density value
     function getColor(d) {
-        if (selectedMetric == 'demRepTurn') {
+        if ((selectedMetric == 'demRepTurn') || (selectedMetric == 'demRepVote')) {
             //console.log(selectedMetric+"_"+ breaks[selectedMetric]+"_"+ breaks[selectedMetric].length+"_"+d);
             //console.log(d+" - "+d);
             for (var i = 0; i < breaks[selectedMetric].length; i++) {
@@ -501,7 +501,7 @@
         labels = [],
         from, to, finalcolor;
 
-        if (selectedMetric == 'demRepTurn') {
+        if ((selectedMetric == 'demRepTurn') || (selectedMetric == 'demRepVote')) {
             breaks[selectedMetric].reverse();    
             for (var i = 0; i < grades.length-1; i++) {
                 from = grades[i+1];
