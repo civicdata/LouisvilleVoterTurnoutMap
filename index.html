@@ -154,6 +154,8 @@
         padding: 5px;
     }
     
+    
+    
   </style>
 </head>
 <body>
@@ -190,6 +192,7 @@
   
   <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
   <script type="text/javascript" src="js/precincts.js"></script>
+  <script type="text/javascript" src="js/pollingLocations.js"></script>
   <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
   <script src="js/Control.Geocoder.CDA.js"></script>
   <script type="text/javascript">
@@ -356,16 +359,7 @@
         
     }
 
-    function style(feature) {
-      return {
-        weight: 1,
-        opacity: 1,
-        color: 'white',
-        //dashArray: '3',
-        fillOpacity: 0.9,
-        fillColor: getColor(feature.properties[selectedMetric])
-      };
-    }
+    
 
     function resetHighlight(e) {
       geojson.resetStyle(e.target);
@@ -389,13 +383,13 @@
       });
 
       if (!L.Browser.ie && !L.Browser.opera) {
-        layer.bringToFront();
+        //layer.bringToFront();
       }
 
       info.update(layer.feature.properties);
     }
 
-    var geojson;
+    var geojson, geojsonLocations;
 
     function zoomToFeature(e) {
       map.fitBounds(e.target.getBounds());
@@ -421,10 +415,72 @@
         $('#controls button#' + selectedMetric).addClass('active');
     }
 
+    function style(feature) {
+      return {
+        weight: 1,
+        opacity: 1,
+        color: 'white',
+        //dashArray: '3',
+        fillOpacity: 0.9,
+        fillColor: getColor(feature.properties[selectedMetric])
+      };
+    }
+    
     geojson = L.geoJson(precincts, {
       style: style,
       onEachFeature: onEachFeature
     }).addTo(map);
+
+    
+    
+    function styleLocation (feature) {
+        var theColor;
+        if (feature.properties.totReg > 3000) {
+            theColor = "#555";
+        } else if (feature.properties.totReg > 2500) {
+            theColor = "#777";
+        } else if (feature.properties.totReg > 2000) {
+            theColor = "#999";
+        } else if (feature.properties.totReg > 1500) {
+            theColor = "#bbb";
+        } else if (feature.properties.totReg > 1000) {
+            theColor = "#ddd";
+        } else {
+            theColor = "#eee";
+        }
+        return {
+            radius: 7,
+            fillColor: theColor,
+            color: "#000",
+            weight: 1,
+            opacity: 1,
+            fillOpacity: 0.8
+        };
+    }
+
+    function popopLocations(feature) {
+        var popupInfo = '';
+        
+        popupInfo += '<strong>Location</strong>: '+feature.properties.LOCATION;
+        popupInfo += '<br><strong>Address</strong>: '+feature.properties.ADDRESS;
+        popupInfo += '<Br><strong>Precincts</strong>: '+feature.properties.precincts;
+        popupInfo += '<br><strong>Voters</strong>: '+ Math.round(feature.properties.totReg );
+        popupInfo += '<br><strong>Turnout</strong>: '+ Math.round(feature.properties.totTurnout* 10 ) / 10 + "%";
+        
+        return popupInfo;
+    }
+    
+    // polling locations { "type": "Feature", "properties": { "ObjectID": 1, "LOCATION": "Sanders Elem Sch Gym", "ADDRESS": "8408 Terry Road", "precincts": "A105,A107", "totReg": 2660.000000, "totVote": 360.000000, "totTurnout": 13.500000 }, "geometry": { "type": "Point", "coordinates": [ -85.874237342999663, 38.131374484000446 ] } },
+    geojsonLocations = L.geoJson(pollingLocations, {
+        pointToLayer: function (feature, latlng) {
+                return L.circleMarker(latlng, styleLocation(feature));
+            },
+      onEachFeature: function (feature, layer) {
+              layer.bindPopup(popopLocations(feature));
+            }
+    }).addTo(map);
+
+    
 
     function flipValue(demRep) {
         if ((demRep) > 1) { // more dems
