@@ -150,10 +150,6 @@
         }
     }
     
-    .btn {
-        padding: 5px;
-    }
-    
   </style>
 </head>
 <body>
@@ -167,7 +163,6 @@
               <button type="button" class="btn btn-default" id="totTurnout">Total</button>
               <button type="button" class="btn btn-default" id="demTurnout">Democrat</button>
               <button type="button" class="btn btn-default" id="repTurnout">Republican</button>
-              <button type="button" class="btn btn-default" id="demRepTurn">Difference</button>
             </div>
         </div>
       </div>
@@ -179,7 +174,6 @@
               <button type="button" class="btn btn-default" id="totReg">Total</button>
               <button type="button" class="btn btn-default" id="demReg">Democrat</button>
               <button type="button" class="btn btn-default" id="repReg">Republican</button>
-              <button type="button" class="btn btn-default" id="demRepVote">Difference</button>
             </div>
         </div>
       </div>
@@ -209,25 +203,20 @@
         'totTurnout': [35,25,15,10],
         'demTurnout': [35,25,15,10],
         'repTurnout': [35,25,15,10],
-        'demRepTurn': [2,1.3,1.1,.9,.75,.5,.4],
         'totReg': [1600,1200,800,400],
         'demReg': [1000,800,400,150],
-        'repReg': [1000,800,400,150],
-        'demRepVote': [2,1.3,1.1,.9,.75,.5,.4]
+        'repReg': [1000,800,400,150]
     };
     
     // Used in the info box code for lookups
     // available JSON data:  {"Name":"A140","county":"56","totReg":"1608","totVote":"294","totTurnout":"18.3","demReg":"882","demVote":"161","demTurnout":"18.3","repReg":"579","repVote":"131","repTurnout":"22.6","otherReg":"147","otherVote":"2","otherTurnout":"1.4"}
-    // { "Name": "J138", "county": "56", "totReg": "396", "totVote": "31", "totTurnout": "7.8", "demReg": "199", "demVote": "11", "demTurnout": "5.5", "repReg": "143", "repVote": "16", "repTurnout": "11.2", "otherReg": "54", "otherVote": "4", "otherTurnout": "7.4", "demRepVote": 0.688000, "demRepTurn": 0.491000 }
     displayValues = {
         'totTurnout': ['totReg', 'totVote'],
         'demTurnout': ['demReg', 'demVote'],
         'repTurnout': ['repReg', 'repVote'],
-        'demRepTurn': ['demVote', 'repVote'],
         'totReg': ['totVote', 'totTurnout'],
         'demReg': ['demVote', 'demTurnout'],
-        'repReg': ['repVote', 'repTurnout'],
-        'demRepVote': ['demTurnout', 'repTurnout']
+        'repReg': ['repVote', 'repTurnout']
     };
     
     colors = [
@@ -236,16 +225,6 @@
         '#fc8d59',
         '#fdcc8a',
         '#fef0d9'
-    ];
-    // blue to grey to red
-    colorsDemRep = [
-        '#1202f9',
-        '#6659f1',
-        '#b3abee',
-        '#d3d2d0',
-        '#ebbcba',
-        '#ed5353',
-        '#fe0000'
     ];
     
     var layer = L.tileLayer('http://tile.stamen.com/toner/{z}/{x}/{y}.png', {
@@ -285,7 +264,7 @@
               this._div.innerHTML += '<b>No Data<b/>';
               return;
           }
-          this._div.innerHTML += '<table border=0 style="padding: 2px;"><tr><td>&nbsp;</td><td align="right">Voters</td><td>&nbsp;&nbsp;Turnout</td></tr> <tr><td><b>Total</b></td><td align="right">' + props['totReg']  + '</td><td align="right">' + props['totTurnout'] + '%</td></tr> <tr><td><b>Democrat</b></td><td align="right">' + props['demReg']  + '</td><td align="right">' + props['demTurnout'] + '%</td></tr> <tr><td><b>Republican</b></td><td align="right">' + props['repReg']  + '</td><td align="right">' + props['repTurnout'] + '%</td></tr> <tr><td><b>Difference</b></td><td align="right">' + Difference(props['demRepVote']) + '</td><td align="right">' + Difference(props['demRepTurn']) + '</td></tr> </table>';
+          this._div.innerHTML += '<table border=0 style="padding: 2px;"><tr><td>&nbsp;</td><td align="right">Voters</td><td>&nbsp;&nbsp;Turnout</td></tr> <tr><td><b>Total</b></td><td align="right">' + props['totReg']  + '</td><td align="right">' + props['totTurnout'] + '%</td></tr> <tr><td><b>Democrat</b></td><td align="right">' + props['demReg']  + '</td><td align="right">' + props['demTurnout'] + '%</td></tr> <tr><td><b>Republican</b></td><td align="right">' + props['repReg']  + '</td><td align="right">' + props['repTurnout'] + '%</td></tr> <tr><td><b>Difference</b></td><td align="right">' + Difference(props['demReg'],props['repReg']) + '</td><td align="right">' + Difference(props['demTurnout'],props['repTurnout']) + '</td></tr> </table>';
          
       } else {
           this._div.innerHTML +=  (isTouchDevice() ? 'Click' : 'Hover over or double<br>click') + ' a precinct.'
@@ -306,20 +285,26 @@
     }
     
     
-    function Difference(demRep) {
+    function Difference(dem, rep) {
         var diff, color, divider, top;
-        if ((demRep) > 1) { // more dems
+        if ((dem-rep) > 0) { // more dems
+            diff = dem-rep;
             color = 'blue';
-        } else if ((demRep) < 1) { // more reps
+            top = dem;
+            divider = rep;
+        } else if ((rep-dem) > 0) { // more reps
+            diff = rep-dem;
             color = 'red';
-            demRep = 1/demRep;
+            top = rep;
+            divider = dem;
         } else { 
             diff = -1;
             color = "black";
+            divider = -1;
         }
     
         if (diff != -1) {
-            percent = Math.round(demRep* 10 ) / 10;
+            percent = Math.round((top)/divider* 10 ) / 10;
             //console.log (dem+' - '+rep+' - '+top+' - '+divider+' - '+percent);
             percent = fixPercent(percent);
         } else {
@@ -334,26 +319,12 @@
     
     // get color depending on population density value
     function getColor(d) {
-        if (selectedMetric == 'demRepTurn') {
-            //console.log(selectedMetric+"_"+ breaks[selectedMetric]+"_"+ breaks[selectedMetric].length+"_"+d);
-            //console.log(d+" - "+d);
-            for (var i = 0; i < breaks[selectedMetric].length; i++) {
-                //console.log(d+" - "+i+" - "+breaks[selectedMetric][i]);
-                if(d > breaks[selectedMetric][i]) {
-                    //console.log(colorsDemRep[i]+" - "+d);
-                    return colorsDemRep[i];
-                }
+        for (var i = 0; i < breaks[selectedMetric].length; i++) {
+            if(d > breaks[selectedMetric][i]) {
+                return colors[i];
             }
-            return '#555555';
-        } else {
-            for (var i = 0; i < breaks[selectedMetric].length; i++) {
-                if(d > breaks[selectedMetric][i]) {
-                    return colors[i];
-                }
-            }
-            return '#FFEDA0';
         }
-        
+        return '#FFEDA0';
     }
 
     function style(feature) {
@@ -426,65 +397,27 @@
       onEachFeature: onEachFeature
     }).addTo(map);
 
-    function flipValue(demRep) {
-        if ((demRep) > 1) { // more dems
-            demRep = demRep;
-        } else  { // more reps
-           
-            demRep = 1/demRep;
-        }
-        return Math.round(demRep* 10 ) / 10;
-    }
-
     var legend = L.control({position: 'bottomright'});
 
     legend.onAdd = function (map) {
 
-        var div = L.DomUtil.create('div', 'info legend'),
+      var div = L.DomUtil.create('div', 'info legend'),
         grades = [0].concat(breaks[selectedMetric].reverse()),
         labels = [],
-        from, to, finalcolor;
+        from, to;
 
-        if (selectedMetric == 'demRepTurn') {
-            breaks[selectedMetric].reverse();    
-            for (var i = 0; i < grades.length-1; i++) {
-                from = grades[i+1];
-                to = grades[i + 2];
-                
-                finalcolor = getColor(from + 1);
-                //console.log('legend ' + from+" - "+to+" - "+(from+1)+" - "+finalcolor+" - "+colorsDemRep[i]+" - "+i+" - "+grades.length);
-                finalRange = '<i style="background:' + colorsDemRep[i] + '"></i> '; 
-                
-                if (i==0) {
-                    finalRange +=  flipValue(grades[i+2]) + '+';
-                } else if (i == (grades.length-2)) {
-                    finalRange += flipValue(from) + '+';
-                } else {
-                    if ((from < 1) && (to < 1)) {
-                        finalRange += flipValue(to) +  '&ndash;' + flipValue(from);
-                    } else {
-                        finalRange += flipValue(from) +  '&ndash;' + flipValue(to);
-                    }
-                }
-                
-                
-                labels.push(finalRange);
-            }
-            
-        } else {
-            breaks[selectedMetric].reverse();    
-            for (var i = 0; i < grades.length; i++) {
-                from = grades[i];
-                to = grades[i + 1];
+      breaks[selectedMetric].reverse();    
+      for (var i = 0; i < grades.length; i++) {
+        from = grades[i];
+        to = grades[i + 1];
 
-                labels.push(
-                    '<i style="background:' + getColor(from + 1) + '"></i> ' +
-                    from + (to ? '&ndash;' + to : '+'));
-            }
-        }
-        
-        div.innerHTML = labels.join('<br>');
-        return div;
+        labels.push(
+          '<i style="background:' + getColor(from + 1) + '"></i> ' +
+          from + (to ? '&ndash;' + to : '+'));
+      }
+
+      div.innerHTML = labels.join('<br>');
+      return div;
     };
 
     legend.addTo(map);
