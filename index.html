@@ -471,7 +471,8 @@
     }
     
     // polling locations { "type": "Feature", "properties": { "ObjectID": 1, "LOCATION": "Sanders Elem Sch Gym", "ADDRESS": "8408 Terry Road", "precincts": "A105,A107", "totReg": 2660.000000, "totVote": 360.000000, "totTurnout": 13.500000 }, "geometry": { "type": "Point", "coordinates": [ -85.874237342999663, 38.131374484000446 ] } },
-    geojsonLocations = L.geoJson(pollingLocations, {
+    /*
+	geojsonLocations = L.geoJson(pollingLocations, {
         pointToLayer: function (feature, latlng) {
                 return L.circleMarker(latlng, styleLocation(feature));
             },
@@ -480,7 +481,7 @@
             }
     }).addTo(map);
 
-    
+    */
 
     function flipValue(demRep) {
         if ((demRep) > 1) { // more dems
