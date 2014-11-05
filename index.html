@@ -214,11 +214,11 @@
         'totTurnout': [35,25,15,10],
         'demTurnout': [35,25,15,10],
         'repTurnout': [35,25,15,10],
-        'demRepTurn': [2,1.3,1.1,.9,.75,.5,.4],
+        'demRepTurn': [10,2,1.3,1.1,.9,.75,.5,.1,.01],
         'totReg': [1600,1200,800,400],
         'demReg': [1000,800,400,150],
         'repReg': [1000,800,400,150],
-        'demRepVote': [2.5,1.3,1.1,.9,.75,.4,.3]
+        'demRepVote': [10,2,1.3,1.1,.9,.75,.5,.1,.01]
     };
     
     // Used in the info box code for lookups
@@ -244,13 +244,15 @@
     ];
     // blue to grey to red
     colorsDemRep = [
-        '#1202f9',
+        '#000077',
+        '#1202e9',
         '#6659f1',
         '#b3abee',
         '#d3d2d0',
         '#ebbcba',
         '#ed5353',
-        '#fe0000'
+        '#ee0000',
+        '#770000'
     ];
     
     var layer = L.tileLayer('http://tile.stamen.com/toner/{z}/{x}/{y}.png', {
@@ -304,6 +306,8 @@
             percent = 'All Rep';
         } else if (percent == 1) {
             percent = 'Even';
+        } else if (percent == 999) {
+            percent = 'None';
         } else {
             percent = percent+'x';
         }
@@ -313,7 +317,9 @@
     
     function Difference(demRep) {
         var diff, color, divider, top;
-        if ((demRep) > 1) { // more dems
+         if ((demRep) == 999) { // more reps
+            color = 'black';
+        } else if ((demRep) > 1) { // more dems
             color = 'blue';
         } else if ((demRep) < 1) { // more reps
             color = 'red';
@@ -322,10 +328,10 @@
             diff = -1;
             color = "black";
         }
-    
+        //console.log (demRep+' - ');
         if (diff != -1) {
             percent = Math.round(demRep* 10 ) / 10;
-            //console.log (dem+' - '+rep+' - '+top+' - '+divider+' - '+percent);
+            
             percent = fixPercent(percent);
         } else {
             percent = 'None';
@@ -345,8 +351,12 @@
             for (var i = 0; i < breaks[selectedMetric].length; i++) {
                 //console.log(d+" - "+i+" - "+breaks[selectedMetric][i]);
                 if(d > breaks[selectedMetric][i]) {
-                    //console.log(colorsDemRep[i]+" - "+d);
-                    return colorsDemRep[i];
+                    //console.log(colorsDemRep[i]+" - "+d+" - "+selectedMetric);
+                    if (d == 999) {
+                         return '#555555';
+                    } else {
+                        return colorsDemRep[i];
+                    }
                 }
             }
             return '#555555';
