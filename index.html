@@ -159,36 +159,38 @@
   </style>
 </head>
 <body>
-  <div id="map"></div>
-  <div id="controls">
-      <div id="controls-inner">
-      <div class="cda-panel cda-panel-default">
-        <div class="cda-panel-heading">Turnout %</div>
-        <div class="cda-panel-body">
-            <div class="btn-group">
-              <button type="button" class="btn btn-default" id="totTurnout">Total</button>
-              <button type="button" class="btn btn-default" id="demTurnout">Democrat</button>
-              <button type="button" class="btn btn-default" id="repTurnout">Republican</button>
-              <button type="button" class="btn btn-default" id="demRepTurn">Difference</button>
-            </div>
-        </div>
-      </div>
-      
-      <div class="cda-panel cda-panel-default">
-        <div class="cda-panel-heading">Registered Voters</div>
-        <div class="cda-panel-body">
-            <div class="btn-group">
-              <button type="button" class="btn btn-default" id="totReg">Total</button>
-              <button type="button" class="btn btn-default" id="demReg">Democrat</button>
-              <button type="button" class="btn btn-default" id="repReg">Republican</button>
-              <button type="button" class="btn btn-default" id="demRepVote">Difference</button>
-            </div>
-        </div>
-      </div>
-      </div>
-  </div>
+    <div id="map"></div>
+	<div id="controls">
+		<div id="controls-inner">
+
+			<div class="cda-panel cda-panel-default">
+				<div class="cda-panel-heading">Turnout %</div>
+				<div class="cda-panel-body">
+					<div class="btn-group">
+						<button type="button" class="btn btn-default" id="totTurnout">Total</button>
+						<button type="button" class="btn btn-default" id="demTurnout">Democrat</button>
+						<button type="button" class="btn btn-default" id="repTurnout">Republican</button>
+						<button type="button" class="btn btn-default" id="demRepTurn">Difference</button>
+					</div>
+				</div>
+			</div>
+
+			<div class="cda-panel cda-panel-default">
+				<div class="cda-panel-heading">Registered Voters</div>
+				<div class="cda-panel-body">
+					<div class="btn-group">
+						<button type="button" class="btn btn-default" id="totReg">Total</button>
+						<button type="button" class="btn btn-default" id="demReg">Democrat</button>
+						<button type="button" class="btn btn-default" id="repReg">Republican</button>
+						<button type="button" class="btn btn-default" id="demRepVote">Difference</button>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
   
-  <div id="attribution"><a href="http://www.civicdataalliance.org/louisville-voter-precinct-turnout/" title="Map Created by Civic Data Alliance. Click for Details."></a></div>
+    <div id="attribution"><a href="http://www.civicdataalliance.org/louisville-voter-precinct-turnout/" title="Map Created by Civic Data Alliance. Click for Details."></a></div>
   
   <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
   <script type="text/javascript" src="js/precincts.js"></script>
@@ -461,7 +463,7 @@
     function popopLocations(feature) {
         var popupInfo = '';
         
-        popupInfo += '<strong>Location</strong>: '+feature.properties.LOCATION;
+        popupInfo += '<span style="font-size:14px;"><strong>'+feature.properties.LOCATION+'</strong></span>';
         popupInfo += '<br><strong>Address</strong>: '+feature.properties.ADDRESS;
         popupInfo += '<Br><strong>Precincts</strong>: '+feature.properties.precincts;
         popupInfo += '<br><strong>Voters</strong>: '+ Math.round(feature.properties.totReg );
@@ -471,7 +473,7 @@
     }
     
     // polling locations { "type": "Feature", "properties": { "ObjectID": 1, "LOCATION": "Sanders Elem Sch Gym", "ADDRESS": "8408 Terry Road", "precincts": "A105,A107", "totReg": 2660.000000, "totVote": 360.000000, "totTurnout": 13.500000 }, "geometry": { "type": "Point", "coordinates": [ -85.874237342999663, 38.131374484000446 ] } },
-    /*
+
 	geojsonLocations = L.geoJson(pollingLocations, {
         pointToLayer: function (feature, latlng) {
                 return L.circleMarker(latlng, styleLocation(feature));
@@ -481,7 +483,7 @@
             }
     }).addTo(map);
 
-    */
+    
 
     function flipValue(demRep) {
         if ((demRep) > 1) { // more dems
