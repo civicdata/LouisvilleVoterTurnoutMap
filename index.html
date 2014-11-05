@@ -164,29 +164,15 @@
 		<div id="controls-inner">
 
 			<div class="cda-panel cda-panel-default">
-				<div class="cda-panel-heading">Turnout %</div>
+				<div class="cda-panel-heading">Votes</div>
 				<div class="cda-panel-body">
 					<div class="btn-group">
-						<button type="button" class="btn btn-default" id="totTurnout">Total</button>
-						<button type="button" class="btn btn-default" id="demTurnout">Democrat</button>
-						<button type="button" class="btn btn-default" id="repTurnout">Republican</button>
-						<button type="button" class="btn btn-default" id="demRepTurn">Difference</button>
+						<button type="button" class="btn btn-default" id="combined">Combined</button>
+						<button type="button" class="btn btn-default" id="alison">Alison</button>
+						<button type="button" class="btn btn-default" id="mitch">Mitch</button>
 					</div>
 				</div>
 			</div>
-
-			<div class="cda-panel cda-panel-default">
-				<div class="cda-panel-heading">Registered Voters</div>
-				<div class="cda-panel-body">
-					<div class="btn-group">
-						<button type="button" class="btn btn-default" id="totReg">Total</button>
-						<button type="button" class="btn btn-default" id="demReg">Democrat</button>
-						<button type="button" class="btn btn-default" id="repReg">Republican</button>
-						<button type="button" class="btn btn-default" id="demRepVote">Difference</button>
-					</div>
-				</div>
-			</div>
-
 		</div>
 	</div>
   
@@ -194,7 +180,6 @@
   
   <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
   <script type="text/javascript" src="js/precincts.js"></script>
-  <script type="text/javascript" src="js/pollingLocations.js"></script>
   <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
   <script src="js/Control.Geocoder.CDA.js"></script>
   <script type="text/javascript">
@@ -207,32 +192,21 @@
     }
     
     var map = L.map('map').setView([38.18395805672033, -85.660400390625], 11);
-    var selectedMetric = 'totTurnout';
+    var selectedMetric = 'combined';
     var lastFeature;
     
     breaks = {
-        'totTurnout': [35,25,15,10],
-        'demTurnout': [35,25,15,10],
-        'repTurnout': [35,25,15,10],
-        'demRepTurn': [10,2,1.3,1.1,.9,.75,.5,.1,.01],
-        'totReg': [1600,1200,800,400],
-        'demReg': [1000,800,400,150],
-        'repReg': [1000,800,400,150],
-        'demRepVote': [10,2,1.3,1.1,.9,.75,.5,.1,.01]
+        'alison': [35,25,15,10],
+        'mitch': [35,25,15,10],
+        'combined': [10,2,1.3,1.1,.9,.75,.5,.1,.01]
     };
     
     // Used in the info box code for lookups
-    // available JSON data:  {"Name":"A140","county":"56","totReg":"1608","totVote":"294","totTurnout":"18.3","demReg":"882","demVote":"161","demTurnout":"18.3","repReg":"579","repVote":"131","repTurnout":"22.6","otherReg":"147","otherVote":"2","otherTurnout":"1.4"}
-    // { "Name": "J138", "county": "56", "totReg": "396", "totVote": "31", "totTurnout": "7.8", "demReg": "199", "demVote": "11", "demTurnout": "5.5", "repReg": "143", "repVote": "16", "repTurnout": "11.2", "otherReg": "54", "otherVote": "4", "otherTurnout": "7.4", "demRepVote": 0.688000, "demRepTurn": 0.491000 }
+    // available JSON data:  {"OBJECTID":1,"PRECINCT":"J138","FORMERPREC":null,"Shape_Area":5472512.60335,"Precinct_1":"J138","McCONNELL":56,"GRIMES":44,"PATTERSON":4,"Total_Vote":104,"rep_demrat":1.27,"perc_dem":42.3,"perc_rep":53.8,"dem_reprat":0.785714}
     displayValues = {
-        'totTurnout': ['totReg', 'totVote'],
-        'demTurnout': ['demReg', 'demVote'],
-        'repTurnout': ['repReg', 'repVote'],
-        'demRepTurn': ['demVote', 'repVote'],
-        'totReg': ['totVote', 'totTurnout'],
-        'demReg': ['demVote', 'demTurnout'],
-        'repReg': ['repVote', 'repTurnout'],
-        'demRepVote': ['demTurnout', 'repTurnout']
+        'combined': ['Total_Vote', 'Total_Vote'],
+        'alison': ['GRIMES', 'GRIMES'],
+        'mitch': ['McCONNELL', 'McCONNELL']
     };
     
     colors = [
@@ -243,7 +217,7 @@
         '#fef0d9'
     ];
     // blue to grey to red
-    colorsDemRep = [
+    colorsCombined = [
         '#000077',
         '#1202e9',
         '#6659f1',
@@ -257,7 +231,7 @@
     
     var layer = L.tileLayer('http://tile.stamen.com/toner/{z}/{x}/{y}.png', {
       maxZoom: 18,
-      attribution: 'Base style by Stamen | Built by the <a href="http://www.civicdataalliance.org/louisville-voter-precinct-turnout/">Civic Data Alliance</a>'
+      attribution: 'Base style by Stamen | Built by the <a href="http://www.civicdataalliance.org//">Civic Data Alliance</a>'
     });
     
     layer.addTo(map);
@@ -284,7 +258,7 @@
     };
 
     info.update = function (props) {
-      this._div.innerHTML = '<h4>May 2014 Primary</h4>';
+      this._div.innerHTML = '<h4>2014 General Election</h4>';
       
       if(props) {
           this._div.innerHTML += '<i>Precinct ' + props['Name'] + '</i><br />';
@@ -292,7 +266,7 @@
               this._div.innerHTML += '<b>No Data<b/>';
               return;
           }
-          this._div.innerHTML += '<table border=0 style="padding: 2px;"><tr><td>&nbsp;</td><td align="right">Voters</td><td>&nbsp;&nbsp;Turnout</td></tr> <tr><td><b>Total</b></td><td align="right">' + props['totReg']  + '</td><td align="right">' + props['totTurnout'] + '%</td></tr> <tr><td><b>Democrat</b></td><td align="right">' + props['demReg']  + '</td><td align="right">' + props['demTurnout'] + '%</td></tr> <tr><td><b>Republican</b></td><td align="right">' + props['repReg']  + '</td><td align="right">' + props['repTurnout'] + '%</td></tr> <tr><td><b>Difference</b></td><td align="right">' + Difference(props['demRepVote']) + '</td><td align="right">' + Difference(props['demRepTurn']) + '</td></tr> </table>';
+          this._div.innerHTML += '<table border=0 style="padding: 2px;"><tr><td>&nbsp;</td><td align="right">Votes</td></tr> <tr><td><b>Alison</b></td><td align="right">' + props['GRIMES']  + '</td></tr> <tr><td><b>Mitch</b></td><td align="right">' + props['McCONNELL']  + '</td></tr> </table>';
          
       } else {
           this._div.innerHTML +=  (isTouchDevice() ? 'Click' : 'Hover over or double<br>click') + ' a precinct.'
@@ -345,17 +319,17 @@
     
     // get color depending on population density value
     function getColor(d) {
-        if ((selectedMetric == 'demRepTurn') || (selectedMetric == 'demRepVote')) {
+        if ((selectedMetric == 'combined') ) {
             //console.log(selectedMetric+"_"+ breaks[selectedMetric]+"_"+ breaks[selectedMetric].length+"_"+d);
             //console.log(d+" - "+d);
             for (var i = 0; i < breaks[selectedMetric].length; i++) {
                 //console.log(d+" - "+i+" - "+breaks[selectedMetric][i]);
                 if(d > breaks[selectedMetric][i]) {
-                    //console.log(colorsDemRep[i]+" - "+d+" - "+selectedMetric);
+                    //console.log(colorsCombined[i]+" - "+d+" - "+selectedMetric);
                     if (d == 999) {
                          return '#d3d2d0';
                     } else {
-                        return colorsDemRep[i];
+                        return colorsCombined[i];
                     }
                 }
             }
@@ -401,7 +375,7 @@
       info.update(layer.feature.properties);
     }
 
-    var geojson, geojsonLocations;
+    var geojson;
 
     function zoomToFeature(e) {
       map.fitBounds(e.target.getBounds());
@@ -470,29 +444,6 @@
         };
     }
 
-    function popopLocations(feature) {
-        var popupInfo = '';
-        
-        popupInfo += '<span style="font-size:14px;"><strong>'+feature.properties.LOCATION+'</strong></span>';
-        popupInfo += '<br><strong>Address</strong>: '+feature.properties.ADDRESS;
-        popupInfo += '<Br><strong>Precincts</strong>: '+feature.properties.precincts;
-        popupInfo += '<br><strong>Voters</strong>: '+ Math.round(feature.properties.totReg );
-        popupInfo += '<br><strong>Turnout</strong>: '+ Math.round(feature.properties.totTurnout* 10 ) / 10 + "%";
-        
-        return popupInfo;
-    }
-    
-    // polling locations { "type": "Feature", "properties": { "ObjectID": 1, "LOCATION": "Sanders Elem Sch Gym", "ADDRESS": "8408 Terry Road", "precincts": "A105,A107", "totReg": 2660.000000, "totVote": 360.000000, "totTurnout": 13.500000 }, "geometry": { "type": "Point", "coordinates": [ -85.874237342999663, 38.131374484000446 ] } },
-
-	geojsonLocations = L.geoJson(pollingLocations, {
-        pointToLayer: function (feature, latlng) {
-                return L.circleMarker(latlng, styleLocation(feature));
-            },
-      onEachFeature: function (feature, layer) {
-              layer.bindPopup(popopLocations(feature));
-            }
-    }).addTo(map);
-
     
 
     function flipValue(demRep) {
@@ -514,15 +465,15 @@
         labels = [],
         from, to, finalcolor;
 
-        if ((selectedMetric == 'demRepTurn') || (selectedMetric == 'demRepVote')) {
+        if ((selectedMetric == 'combined')) {
             breaks[selectedMetric].reverse();    
             for (var i = 0; i < grades.length-1; i++) {
                 from = grades[i+1];
                 to = grades[i + 2];
                 
                 finalcolor = getColor(from + 1);
-                //console.log('legend ' + from+" - "+to+" - "+(from+1)+" - "+finalcolor+" - "+colorsDemRep[i]+" - "+i+" - "+grades.length);
-                finalRange = '<i style="background:' + colorsDemRep[i] + '"></i> '; 
+                //console.log('legend ' + from+" - "+to+" - "+(from+1)+" - "+finalcolor+" - "+colorsCombined[i]+" - "+i+" - "+grades.length);
+                finalRange = '<i style="background:' + colorsCombined[i] + '"></i> '; 
                 
                 if (i==0) {
                     finalRange +=  flipValue(grades[i+2]) + '+';
